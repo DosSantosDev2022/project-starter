@@ -109,4 +109,4 @@ Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE](
 
 ---
 
-**Desenvolvido por [Juliano Santos].** 😎
+**Desenvolvido por Juliano Santos.** 😎
