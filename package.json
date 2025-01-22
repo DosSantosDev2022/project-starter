@@ -1,0 +1,14 @@
+{
+	"name": "@dossantosdev/project-starter",
+	"version": "1.0.0",
+	"description": "Um CLI para iniciar projetos de forma rápida e padronizada",
+	"main": "starter.js",
+	"bin": {
+		"project-starter": "./starter.js"
+	},
+	"dependencies": {
+		"inquirer": "^12.3.2"
+	},
+	"author": "Juliano Santos",
+	"license": "MIT"
+}
