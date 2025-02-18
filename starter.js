@@ -27,16 +27,15 @@ const path = require('path');
 
   const { projectType, projectName } = await inquirer.prompt(initialQuestions);
 
-  // Comando para criar o projeto inicial
   try {
+    const projectPath = path.join(process.cwd(), projectName);
+
     if (projectType === 'Next.js') {
       console.log('Criando um projeto Next.js...');
       execSync(`npx create-next-app@latest --use-pnpm ${projectName} --ts`, { stdio: 'inherit' });
 
       console.log('Criando estrutura de pastas...');
-      const srcPath = path.join(process.cwd(), projectName, 'src');
-      const appPath = path.join(srcPath, 'app');
-
+      const srcPath = path.join(projectPath, 'src');
       const folders = [
         '@types',
         'assets/fonts',
@@ -44,7 +43,7 @@ const path = require('path');
         'hooks',
         'lib',
         'utils',
-        'components/UI',
+        'components/ui',
         'components/global',
         'components/pages',
         'components/layout',
@@ -54,41 +53,29 @@ const path = require('path');
         'providers',
         'actions',
         'app/api',
-        'app/(pages)'
+        'app/(pages)',
       ];
 
-      folders.forEach((folder) => {
-        const fullPath = path.join(srcPath, folder);
-        fs.mkdirSync(fullPath, { recursive: true });
-      });
+      folders.forEach((folder) => fs.mkdirSync(path.join(srcPath, folder), { recursive: true }));
 
       // Movendo o arquivo global.css para styles
+      const globalCSSPath = path.join(srcPath, 'app/globals.css');
       const stylesPath = path.join(srcPath, 'styles');
-      const globalCSSPath = path.join(process.cwd(), projectName, 'src/app/', 'globals.css');
-      fs.renameSync(globalCSSPath, path.join(stylesPath, 'globals.css'));
 
-      // Garante que a pasta src/styles existe antes de mover o arquivo
       if (!fs.existsSync(stylesPath)) {
         fs.mkdirSync(stylesPath, { recursive: true });
       }
 
       if (fs.existsSync(globalCSSPath)) {
-        fs.renameSync(globalCSSPath, newGlobalCSSPath);
+        fs.renameSync(globalCSSPath, path.join(stylesPath, 'globals.css'));
       } else {
         console.warn(`Aviso: O arquivo ${globalCSSPath} não foi encontrado.`);
       }
-
-      // Limpando a pasta public
-      const publicPath = path.join(process.cwd(), projectName, 'public');
-      fs.readdirSync(publicPath).forEach((file) => {
-        fs.unlinkSync(path.join(publicPath, file));
-      });
     } else if (projectType === 'Vite.js') {
       console.log('Criando um projeto Vite.js...');
       execSync(`pnpm create vite ${projectName} --template react-ts`, { stdio: 'inherit' });
 
       console.log('Instalando dependências iniciais...');
-      const projectPath = path.join(process.cwd(), projectName);
       execSync(`cd ${projectName} && pnpm install`, { stdio: 'inherit' });
 
       console.log('Criando estrutura de pastas...');
@@ -109,17 +96,9 @@ const path = require('path');
         'pages',
       ];
 
-      folders.forEach((folder) => {
-        const fullPath = path.join(srcPath, folder);
-        fs.mkdirSync(fullPath, { recursive: true });
-      });
+      folders.forEach((folder) => fs.mkdirSync(path.join(srcPath, folder), { recursive: true }));
 
       // Limpando arquivos desnecessários
-      const publicPath = path.join(projectPath, 'public');
-      fs.readdirSync(publicPath).forEach((file) => {
-        fs.unlinkSync(path.join(publicPath, file));
-      });
-
       const filesToRemove = ['App.css', 'index.css'];
       filesToRemove.forEach((file) => {
         const filePath = path.join(srcPath, file);
@@ -127,20 +106,85 @@ const path = require('path');
       });
     }
 
-    // Perguntar quais dependências instalar
+    // Função para instalar dependências
+    const installDependencies = () => {
+      console.log('Instalando dependências...');
+
+      const dependencies = [
+        'react-icons',
+        'react-hook-form',
+        '@hookform/resolvers',
+        'zod',
+        'zustand',
+        'uuid',
+        'tailwind-merge',
+        'tailwind-scrollbar',
+        'date-fns',
+        'framer-motion',
+      ];
+
+      const devDependencies = [
+        'eslint',
+        'prettier',
+        'husky',
+        'lint-staged',
+        'commitlint',
+        '@commitlint/config-conventional',
+      ];
+
+      execSync(`pnpm install ${dependencies.join(' ')}`, { stdio: 'inherit', cwd: projectPath });
+      execSync(`pnpm install --save-dev ${devDependencies.join(' ')}`, { stdio: 'inherit', cwd: projectPath });
+    };
+
+    // Função para instalar bibliotecas de teste
+    const installTestingLibraries = () => {
+      console.log('Instalando bibliotecas de teste...');
+      const testingLibraries = [
+        '@testing-library/dom',
+        '@testing-library/jest-dom',
+        '@testing-library/react',
+        '@testing-library/user-event',
+        'vitest',
+      ];
+      execSync(`pnpm install --save-dev ${testingLibraries.join(' ')}`, { stdio: 'inherit', cwd: projectPath });
+    };
+
+    // Função para configurar Husky
+    const setupHusky = () => {
+      console.log('Configurando Husky...');
+
+      execSync('pnpm exec husky init', { stdio: 'inherit', cwd: projectPath });
+
+      const preCommitFilePath = path.join(projectPath, '.husky', 'pre-commit');
+      const commitMsgFilePath = path.join(projectPath, '.husky', 'commit-msg');
+
+      if (fs.existsSync(preCommitFilePath)) {
+        fs.writeFileSync(preCommitFilePath, 'npx lint-staged\n', { flag: 'w' });
+        console.log('Comando "npx lint-staged" adicionado ao hook pre-commit.');
+      } else {
+        console.error('Erro: Arquivo pre-commit não encontrado.');
+      }
+
+      if (!fs.existsSync(commitMsgFilePath)) {
+        fs.writeFileSync(commitMsgFilePath, 'npx --no-install commitlint --edit $1\n');
+        console.log('Arquivo "commit-msg" criado.');
+      }
+    };
+
+    // Perguntar quais dependências adicionais instalar
     console.log('Selecione as bibliotecas que deseja instalar:');
-    const dependencies = [
+    const dependenciesOptions = [
       'React Icons',
-      'React hook form',
-      'hookform/resolvers',
-      'zod',
-      'zustand',
-      'uuid',
-      'tailwind-merge',
-      'tailwind-scrollbar',
-      'date-fns',
-      'framer-motion',
-      'lib-scss (apenas para Vite.js)',
+      'React Hook Form',
+      'HookForm Resolvers',
+      'Zod',
+      'Zustand',
+      'UUID',
+      'Tailwind Merge',
+      'Tailwind Scrollbar',
+      'Date-fns',
+      'Framer Motion',
+      'Bibliotecas de Teste (@testing-library, Vitest)',
     ];
 
     const { selectedDependencies } = await inquirer.prompt([
@@ -148,21 +192,19 @@ const path = require('path');
         type: 'checkbox',
         name: 'selectedDependencies',
         message: 'Selecione as bibliotecas desejadas:',
-        choices: dependencies,
+        choices: dependenciesOptions,
       },
     ]);
 
-    console.log('Instalando dependências selecionadas...');
-    const installCommands = selectedDependencies.map((dep) => {
-      if (dep === 'lib-scss (apenas para Vite.js)') return 'npx lib-scss';
-      return `pnpm install ${dep.toLowerCase().replace(/\s/g, '-')}`;
-    });
+    installDependencies();
 
-    installCommands.forEach((cmd) => {
-      execSync(cmd, { stdio: 'inherit', cwd: path.join(process.cwd(), projectName) });
-    });
+    if (selectedDependencies.includes('Bibliotecas de Teste (@testing-library, Vitest)')) {
+      installTestingLibraries();
+    }
 
-    console.log('Projeto criado com sucesso!');
+    setupHusky();
+
+    console.log('Projeto configurado com sucesso! 🚀');
   } catch (error) {
     console.error('Erro ao criar o projeto:', error.message);
   }

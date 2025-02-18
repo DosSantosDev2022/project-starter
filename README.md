@@ -13,28 +13,12 @@ O **Project Starter** é um script Node.js que facilita a criação de novos pro
 
 ## Como Usar
 
-### 1. Clonando o Repositório
+###  Utilize nosso CLI para iniciar o seu projeto
 
-Clone este repositório em sua máquina local:
-
-```bash
-git clone https://github.com/SEU-USUARIO/project-starter.git
-```
-
-### 2. Instalando as Dependências
-
-Instale as dependências do script:
+Para utilizar nosso starter basta rodar o comando abaixo em seu terminal:
 
 ```bash
-npm install
-```
-
-### 3. Executando o Script
-
-Após a instalação, execute o script para criar um novo projeto:
-
-```bash
-node create-project.js
+npx project-starter
 ```
 
 O script irá guiá-lo por uma série de perguntas para configurar seu novo projeto. Você poderá escolher entre:
@@ -57,9 +41,10 @@ Durante a execução do script, você poderá escolher as bibliotecas para insta
 - **Tailwind Scrollbar**
 - **Date-fns**
 - **Framer Motion**
-- **lib-scss (apenas para Vite.js)**
+- **lib-scss (um package de configurações para scss)**
+- **vitest**
 
-### 5. Personalizando o Projeto
+### 5. Estrutura do Projeto
 
 Após a execução do script, o projeto será criado com a seguinte estrutura de pastas:
 
@@ -72,7 +57,7 @@ src/
   lib/
   utils/
   components/
-    UI/
+    ui/
     global/
     pages/
     layout/
@@ -85,8 +70,6 @@ src/
     (pages)
 styles/
   globals.css
-public/
-  [limpo de arquivos desnecessários]
 ```
 
 ### 6. Instalação das Dependências
