@@ -2,6 +2,10 @@
 	"name": "@dossantosdev/project-starter",
 	"version": "1.0.0",
 	"description": "Um CLI para iniciar projetos de forma rápida e padronizada",
+	"private": false,
+	"publishConfig": {
+		"access": "public"
+	},
 	"main": "starter.js",
 	"bin": {
 		"project-starter": "./starter.js"
