@@ -1,6 +1,6 @@
 {
 	"name": "@dossantosdev/project-starter",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Um CLI para iniciar projetos de forma rápida e padronizada",
 	"private": false,
 	"publishConfig": {
