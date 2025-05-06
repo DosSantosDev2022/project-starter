@@ -10,6 +10,8 @@ O **Project Starter** é um script Node.js que facilita a criação de novos pro
 - Instalação das bibliotecas mais comuns, como **React Icons**, **React Hook Form**, **Zod**, **Zustand**, **Tailwind CSS** e outras.
 - Integração com **pnpm** para instalar as dependências de forma rápida e eficiente.
 - Suporte para limpar arquivos desnecessários e organizar seu projeto automaticamente.
+- Configuração de ORM Prisma para conexão de banco de dados
+- Configuração do Next-Auth , para projetos Next-js
 
 ## Como Usar
 
@@ -43,6 +45,9 @@ Durante a execução do script, você poderá escolher as bibliotecas para insta
 - **Framer Motion**
 - **lib-scss (um package de configurações para scss)**
 - **vitest**
+- **Prisma**
+- **Next-Auth**
+_ **E muito mais..**
 
 ### 5. Estrutura do Projeto
 
