@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+const prompts = require("prompts");
 const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -138,58 +138,99 @@ const path = require("path");
 			});
 		}
 
-		// Função para instalar dependências
-		const installDependencies = () => {
-			console.log("Instalando dependências...");
+		const installLibraries = async () => {
+			console.log("📦 Selecionando bibliotecas a serem instaladas...");
 
-			const dependencies = [
-				"react-icons",
-				"react-hook-form",
-				"@hookform/resolvers",
-				"zod",
-				"zustand",
-				"uuid",
-				"tailwind-merge",
-				"tailwind-scrollbar",
-				"date-fns",
-				"framer-motion",
-			];
-
-			const devDependencies = [
-				"@biomejs/biome",
-				"husky",
-				"lint-staged",
-				"commitlint",
-				"@commitlint/config-conventional",
-			];
-
-			execSync(`pnpm install ${dependencies.join(" ")}`, {
-				stdio: "inherit",
-				cwd: projectPath,
+			const { selectedLibraries } = await prompts({
+				type: "multiselect",
+				name: "selectedLibraries",
+				message: "Quais bibliotecas você deseja instalar?",
+				choices: [
+					{ title: "React Hook Form", value: "react-hook-form" },
+					{ title: "Zod", value: "zod" },
+					{ title: "@hookform/resolvers", value: "@hookform/resolvers" },
+					{ title: "Zustand", value: "zustand" },
+					{ title: "uuid", value: "uuid" },
+					{ title: "date-fns", value: "date-fns" },
+					{ title: "Framer Motion", value: "framer-motion" },
+					{ title: "Tailwind Merge", value: "tailwind-merge" },
+					{ title: "Tailwind Scrollbar", value: "tailwind-scrollbar" },
+					{ title: "bcryptjs", value: "bcryptjs" },
+					{ title: "react-icons", value: "react-icons" },
+				],
+				hint: "- Espaço para selecionar. Enter para confirmar",
 			});
-			execSync(`pnpm install --save-dev ${devDependencies.join(" ")}`, {
-				stdio: "inherit",
-				cwd: projectPath,
-			});
+
+			if (selectedLibraries.length > 0) {
+				console.log("Instalando bibliotecas selecionadas...");
+				execSync(`pnpm install ${selectedLibraries.join(" ")}`, {
+					stdio: "inherit",
+					cwd: projectPath,
+				});
+			} else {
+				console.log("Nenhuma biblioteca selecionada para instalação.");
+			}
 		};
 
-		const installTestingLibraries = () => {
-			console.log("Instalando bibliotecas de teste...");
-			const testingLibraries = [
-				"@testing-library/dom",
-				"@testing-library/jest-dom",
-				"@testing-library/react",
-				"@testing-library/user-event",
-				"vitest",
-			];
-			execSync(`pnpm install --save-dev ${testingLibraries.join(" ")}`, {
-				stdio: "inherit",
-				cwd: projectPath,
+		const installDevTools = async () => {
+			const { selectedDevTools } = await prompts({
+				type: "multiselect",
+				name: "selectedDevTools",
+				message: "Quais ferramentas de desenvolvimento você deseja instalar?",
+				choices: [
+					{ title: "Biome", value: "@biomejs/biome" },
+					{ title: "Husky", value: "husky" },
+					{ title: "Lint-staged", value: "lint-staged" },
+					{ title: "Commitlint", value: "commitlint" },
+					{
+						title: "@commitlint/config-conventional",
+						value: "@commitlint/config-conventional",
+					},
+				],
+				hint: "- Espaço para selecionar. Enter para confirmar",
 			});
+
+			if (selectedDevTools.length > 0) {
+				console.log("Instalando ferramentas de desenvolvimento...");
+				execSync(`pnpm install --save-dev ${selectedDevTools.join(" ")}`, {
+					stdio: "inherit",
+					cwd: projectPath,
+				});
+			} else {
+				console.log("Nenhuma ferramenta de desenvolvimento selecionada.");
+			}
 		};
 
-		installDependencies();
-		installTestingLibraries();
+		const installTestingLibraries = async () => {
+			const { installTests } = await prompts({
+				type: "confirm",
+				name: "installTests",
+				message:
+					"Deseja instalar bibliotecas de testes (Vitest + Testing Library)?",
+				initial: true,
+			});
+
+			if (installTests) {
+				const testingLibraries = [
+					"@testing-library/dom",
+					"@testing-library/jest-dom",
+					"@testing-library/react",
+					"@testing-library/user-event",
+					"vitest",
+				];
+				console.log("Instalando bibliotecas de teste...");
+				execSync(`pnpm install --save-dev ${testingLibraries.join(" ")}`, {
+					stdio: "inherit",
+					cwd: projectPath,
+				});
+			} else {
+				console.log("Instalação de bibliotecas de teste ignorada.");
+			}
+		};
+
+		await installLibraries();
+		await installDevTools();
+		await installTestingLibraries();
 
 		// Função para configurar Biome
 		const configureBiome = () => {
@@ -376,11 +417,11 @@ const path = require("path");
 					
 					const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-					const prisma = globalForPrisma.prisma || new PrismaClient()
+					const db = globalForPrisma.prisma || new PrismaClient()
 
-					if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+					if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 
-					export default prisma;
+					export default db;
 			`;
 			fs.writeFileSync(prismaTSPath, prismaClientCode);
 			console.log("Arquivo lib/prisma.ts configurado com sucesso!");
@@ -389,7 +430,7 @@ const path = require("path");
 		const setupNextAuth = () => {
 			console.log("Instalando NextAuth.js...");
 
-			execSync("pnpm install next-auth", {
+			execSync("pnpm install next-auth @next-auth/prisma-adapter", {
 				stdio: "inherit",
 				cwd: projectPath,
 			});
@@ -547,6 +588,14 @@ const path = require("path");
 		if (useNextAuth && projectType === "Next.js") {
 			setupNextAuth();
 		}
+
+		// Rodar o script de formatação no final
+		console.log("Executando pnpm lint...");
+		execSync("pnpm lint", { stdio: "inherit", cwd: projectPath });
+
+		// Rodar o script de formatação no final
+		console.log("Executando pnpm format...");
+		execSync("pnpm format", { stdio: "inherit", cwd: projectPath });
 
 		console.log("Projeto configurado com sucesso! 🚀");
 	} catch (error) {
