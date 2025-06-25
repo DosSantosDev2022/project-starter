@@ -1,6 +1,6 @@
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from'fs';
+import path from 'path';
 
 function setupPrisma(projectPath) {
   console.log('Instalando e configurando Prisma...');
@@ -31,25 +31,25 @@ function setupPrisma(projectPath) {
   const schemaPath = path.join(projectPath, 'prisma', 'schema.prisma');
   if (fs.existsSync(schemaPath)) {
     const schemaContent = `
-generator client {
-  provider = "prisma-client-js"
-}
+      generator client {
+        provider = "prisma-client-js"
+      }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+      datasource db {
+        provider = "postgresql"
+        url      = env("DATABASE_URL")
+      }
 
-model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String    @unique
-  password      String?   // Adicionado para login com credenciais
-  emailVerified DateTime? // Para controle de verificação de e-mail
-  image         String?   // Para fotos de perfil (Google Provider)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
+      model User {
+        id            String    @id @default(uuid())
+        name          String
+        email         String    @unique
+        password      String?   // Adicionado para login com credenciais
+        emailVerified DateTime? // Para controle de verificação de e-mail
+        image         String?   // Para fotos de perfil (Google Provider)
+        createdAt     DateTime  @default(now())
+        updatedAt     DateTime  @updatedAt
+      }
 `.trim();
     fs.writeFileSync(schemaPath, schemaContent, { flag: 'w' });
     console.log("Modelo 'User' atualizado no schema.prisma com campos para NextAuth.");
@@ -65,15 +65,15 @@ model User {
 
   const prismaTSPath = path.join(libPath, 'prisma.ts');
   const prismaClientCode = `
-import { PrismaClient } from '@prisma/client'
- 
-const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
+    import { PrismaClient } from '@prisma/client'
+    
+    const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
 
-const db = globalForPrisma.prisma ?? new PrismaClient();
+    const db = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
+    if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 
-export default db;
+    export default db;
 `.trim();
   fs.writeFileSync(prismaTSPath, prismaClientCode);
   console.log("Arquivo lib/prisma.ts configurado com sucesso!");
@@ -231,7 +231,7 @@ NEXT_PUBLIC_URL=http://localhost:3000
   console.log("✅ Arquivo .env.local atualizado com variáveis de ambiente para o NextAuth.");
 }
 
-module.exports = {
+export  {
   setupPrisma,
   setupNextAuth,
 };

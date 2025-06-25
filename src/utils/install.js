@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+import { execSync } from 'child_process';
 
 async function installDependencies(projectPath, getQuestionsFn, dependencyType) {
   const { selectedLibraries, selectedDevTools, installTests } = await getQuestionsFn();
@@ -37,6 +37,6 @@ async function installDependencies(projectPath, getQuestionsFn, dependencyType) 
   }
 }
 
-module.exports = {
+export {
   installDependencies,
 };

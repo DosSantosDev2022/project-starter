@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
-const { getInitialQuestions, getPrismaQuestion, getNextAuthQuestion, getLibraryQuestions, getDevToolsQuestions, getTestQuestions } = require('./utils/prompts');
-const { createProject, setupProjectStructure } = require('./utils/project-setup');
-const { installDependencies } = require('./utils/install');
-const { configureBiome, configurePackageJson, setupHusky } = require('./utils/configs');
-const { setupPrisma, setupNextAuth } = require('./utils/auth-db-setup');
+import { execSync } from 'child_process';
+import path from 'path';
+import { getInitialQuestions, getPrismaQuestion, getNextAuthQuestion, getLibraryQuestions, getDevToolsQuestions, getTestQuestions } from './utils/prompts.js';
+import { createProject, setupProjectStructure } from './utils/project-setup.js';
+import { installDependencies } from './utils/install.js';
+import { configureBiome, configurePackageJson, setupHusky } from './utils/configs.js';
+import { setupPrisma, setupNextAuth } from './utils/auth-db-setup.js';
 
 
 (async () => {

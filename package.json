@@ -1,8 +1,9 @@
 {
 	"name": "@dossantosdev/project-starter",
-	"version": "1.2.2",
+	"version": "1.3.2",
 	"description": "Um CLI para iniciar projetos de forma rápida e padronizada",
 	"private": false,
+	"type": "module",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -11,7 +12,7 @@
 		"project-starter": "./src/index.js"
 	},
 	"dependencies": {
-		"inquirer": "^12.3.2",
+		"inquirer": "latest",
 		"prompts": "^2.4.2"
 	},
 	"author": "Juliano Santos",

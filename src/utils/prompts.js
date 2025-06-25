@@ -1,5 +1,5 @@
-const prompts = require('prompts');
-const inquirer = require('inquirer'); // Use require para inquirer também
+import prompts from 'prompts';
+import inquirer from 'inquirer';
 
 async function getInitialQuestions() {
   return inquirer.prompt([
@@ -94,7 +94,7 @@ async function getTestQuestions() {
   });
 }
 
-module.exports = {
+export {
   getInitialQuestions,
   getPrismaQuestion,
   getNextAuthQuestion,
