@@ -7,6 +7,7 @@ import { createProject, setupProjectStructure } from './utils/project-setup.js';
 import { installDependencies } from './utils/install.js';
 import { configureBiome, configurePackageJson, setupHusky } from './utils/configs.js';
 import { setupPrisma, setupNextAuth } from './utils/auth-db-setup.js';
+import { setupUiLibrary } from './utils/ui-setup.js';
 
 
 (async () => {
@@ -17,7 +18,8 @@ import { setupPrisma, setupNextAuth } from './utils/auth-db-setup.js';
     const { projectType, projectName } = await getInitialQuestions();
     const { usePrisma } = await getPrismaQuestion();
     const { useNextAuth } = await getNextAuthQuestion(projectType); // Passa projectType se NextAuth só for para Next.js
-
+     // Coleta informações sobre a UI
+     const { useUiLibrary, selectedUiLibrary } = await getUiLibraryQuestion();
     const projectPath = path.join(process.cwd(), projectName);
 
     // 2. Criação e estrutura do projeto
@@ -29,6 +31,10 @@ import { setupPrisma, setupNextAuth } from './utils/auth-db-setup.js';
     await installDependencies(projectPath, getDevToolsQuestions, 'devDependencies');
     await installDependencies(projectPath, getTestQuestions, 'devDependencies');
 
+    // NOVA ETAPA: 3.1 Instalação e Configuração de Biblioteca de UI
+    if (useUiLibrary && selectedUiLibrary) {
+      await setupUiLibrary(selectedUiLibrary, projectPath, projectType);
+    }
 
     // 4. Configuração de ferramentas
     if (await getDevToolsQuestions().then(res => res.selectedDevTools.includes('@biomejs/biome'))) {
